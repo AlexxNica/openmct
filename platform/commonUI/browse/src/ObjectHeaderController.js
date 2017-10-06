@@ -45,24 +45,40 @@ define(
                 return;
             }
 
-            if (event.which === 13) {
+            if (this.enterKeyHandled === true) {
+                this.enterKeyHandled = false;
+                return;
+            }
+
+            if (event.type === 'blur') {
+                this.updateModel(event);
+            } else if (event.which === 13) {
+                this.updateModel(event);
+                this.enterKeyHandled = true;
                 event.currentTarget.blur();
-                window.getSelection().removeAllRanges();
-            } else if (event.type === 'blur') {
-                var name = event.currentTarget.textContent;
+            }
 
-                if (name.length === 0) {
-                    name = "Unnamed " + this.$scope.domainObject.getCapability("type").typeDef.name;
-                    event.currentTarget.textContent = name;
-                }
+            this.$scope.editing = false;
+        };
 
-                if (name !== this.$scope.domainObject.model.name) {
-                    this.$scope.domainObject.getCapability('mutation').mutate(function (model) {
-                        model.name = name;
-                    });
-                }
+        /**
+         * 
+         * 
+         * @param event the mouse event
+         * @param private
+         */
+        ObjectHeaderController.prototype.updateModel = function (event) {
+            var name = event.currentTarget.textContent.replace(/\n/g,' ');
 
-                this.$scope.editing = false;
+            if (name.length === 0) {
+                name = "Unnamed " + this.$scope.domainObject.getCapability("type").typeDef.name;
+                event.currentTarget.textContent = name;
+            }
+
+            if (name !== this.$scope.domainObject.model.name) {
+                this.$scope.domainObject.getCapability('mutation').mutate(function (model) {
+                    model.name = name;
+                });
             }
         };
 
