@@ -41,12 +41,7 @@ define(
          * @param event the mouse event
          */
         ObjectHeaderController.prototype.updateName = function (event) {
-            if (!event) {
-                return;
-            }
-
-            if (this.enterKeyHandled === true) {
-                this.enterKeyHandled = false;
+            if (!event && !event.currentTarget) {
                 return;
             }
 
@@ -54,8 +49,8 @@ define(
                 this.updateModel(event);
             } else if (event.which === 13) {
                 this.updateModel(event);
-                this.enterKeyHandled = true;
                 event.currentTarget.blur();
+                window.getSelection().removeAllRanges();
             }
 
             this.$scope.editing = false;
