@@ -32,7 +32,8 @@ define(
          */
         function ObjectHeaderController($scope) {
             this.$scope = $scope;
-            $scope.editing = false;
+            this.domainObject = $scope.domainObject;
+            this.editable = this.allowEdit();
         }
 
         /**
@@ -52,12 +53,10 @@ define(
                 event.currentTarget.blur();
                 window.getSelection().removeAllRanges();
             }
-
-            this.$scope.editing = false;
         };
 
         /**
-         * 
+         * Updates the model.
          * 
          * @param event the mouse event
          * @param private
@@ -66,22 +65,26 @@ define(
             var name = event.currentTarget.textContent.replace(/\n/g,' ');
 
             if (name.length === 0) {
-                name = "Unnamed " + this.$scope.domainObject.getCapability("type").typeDef.name;
+                name = "Unnamed " + this.domainObject.getCapability("type").typeDef.name;
                 event.currentTarget.textContent = name;
             }
-
-            if (name !== this.$scope.domainObject.model.name) {
-                this.$scope.domainObject.getCapability('mutation').mutate(function (model) {
+                
+            if (name !== this.domainObject.model.name) {
+                this.domainObject.getCapability('mutation').mutate(function (model) {
                     model.name = name;
                 });
             }
         };
 
         /**
-         * Marks the status of the field as editing.
+         * Checks if the domain object is editable.
+         *
+         * @private
+         * @return true if object is editable
          */
-        ObjectHeaderController.prototype.edit = function () {
-            this.$scope.editing = true;
+        ObjectHeaderController.prototype.allowEdit = function () {
+            var type = this.domainObject && this.domainObject.getCapability('type');
+            return !!(type && type.hasFeature('creation'));
         };
 
         return ObjectHeaderController;
